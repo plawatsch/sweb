@@ -18,7 +18,8 @@ Mutex::Mutex(const char* name) :
   sleepers_(),
   held_by_(0),
   spinlock_(name),
-  name_(name ? name : "")
+  name_(name ? name : ""),
+  yield_(0)
 {
 }
 
@@ -95,8 +96,15 @@ void Mutex::release(const char* debug_info)
 {
   checkInvalidRelease("Mutex::release", debug_info);
   //kprintfd("Mutex::release %x %s, %s\n", this, name_, debug_info);
+
   mutex_ = 0;
+  if (Scheduler::instance() && currentThread && yield_)
+  {
+   //Scheduler::instance()->yield();
+  }
+
   held_by_=0;
+
   spinlock_.acquire();
   if ( ! sleepers_.empty() )
   {

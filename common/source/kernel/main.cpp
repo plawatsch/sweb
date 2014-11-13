@@ -57,6 +57,27 @@ extern Console* main_console;
 uint32 boot_completed;
 uint32 we_are_dying;
 FsWorkingDirectory default_working_dir;
+static Mutex *m=0;
+static volatile int some_noise=0;
+
+class Dummy : public Thread
+{
+  public:
+    Dummy():Thread("dummy"){}
+    virtual void Run()
+    {
+
+
+      while (1)
+      {
+        m->acquire();
+        m->release();
+        while ((++some_noise % 10000));
+      }
+
+    }
+};
+
 
 /**
  * startup called in @ref boot.s
@@ -160,6 +181,36 @@ void startup()
    );
 
   Scheduler::instance()->printThreadList();
+
+
+  m = new Mutex("somename");
+  m->yield_ = 1;
+  Scheduler::instance()->printThreadList();
+  Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+  Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+  Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+    Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+    Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+    Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+    Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+    Scheduler::instance()->addNewThread (
+        new Dummy()  // see user_progs.h
+    );
+  
 
   kprintf ( "Now enabling Interrupts...\n" );
   boot_completed = 1;

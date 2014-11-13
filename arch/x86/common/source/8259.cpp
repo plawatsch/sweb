@@ -21,12 +21,21 @@ void initialise8259s()
   outportb(PIC_2_DATA_PORT, 0x02);
   outportb(PIC_2_DATA_PORT, 0x01);
 
+
+
   uint16 i;
   for (i=0;i<16;++i)
     disableIRQ(i);
 
   for (i=0;i<16;++i)
     sendEOI(i);
+
+
+  // set timer to roughly 1khz
+  outportb(0x43, 0x36);
+  outportb(0x40, 0xA9);
+  outportb(0x40, 0x04);
+
 }
 
 void enableIRQ(uint16 number)
